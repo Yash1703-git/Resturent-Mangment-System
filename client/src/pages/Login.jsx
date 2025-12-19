@@ -1,7 +1,9 @@
 import React, { useState, useContext } from 'react';
 import API from '../api/api';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import { Import } from 'lucide-react';
+// import { AuthContext } from '../contexts/AuthContext';
+import AuthContext from '../contexts/AuthContext';
 
 export default function Login(){
   const [email,setEmail] = useState(''); const [password,setPassword] = useState('');

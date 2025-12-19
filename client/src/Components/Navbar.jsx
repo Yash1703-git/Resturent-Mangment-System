@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CartContext } from '../contexts/CartContext';
-import { AuthContext } from '../contexts/AuthContext';
+// import { CartContext } from '../contexts/CartContext';
+import CartContext from '../contexts/cartContext'
+// import AuthContext from '../contexts/authContext';
+import AuthContext from '../contexts/AuthContext';
 import { ShoppingCart, LogIn, User, PlusCircle } from 'lucide-react';
 import SearchBar from './SearchBar';
 

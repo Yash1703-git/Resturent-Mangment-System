@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
 import API from '../api/api';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
+import  AuthContext  from '../contexts/AuthContext';
+// import AuthContext from '../contexts/authContext';
 
 export default function Signup(){
   const [name,setName] = useState(''); const [email,setEmail] = useState(''); const [password,setPassword] = useState('');

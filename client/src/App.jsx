@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+// import Navbar from './components/Navbar';
+import Navbar from './Components/Navbar';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Login from './pages/Login';
@@ -11,7 +12,7 @@ import MyOrders from './pages/MyOrders';
 import AdminAddFood from './pages/AdminAddFood';
 import AdminOrders from './pages/AdminOrders';
 import { useContext } from 'react';
-import { AuthContext } from './contexts/AuthContext';
+import AuthContext  from './contexts/AuthContext';
 
 const Protected = ({ children, adminOnly=false }) => {
   const { user } = useContext(AuthContext);

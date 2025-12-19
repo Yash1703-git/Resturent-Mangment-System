@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { CartContext } from '../contexts/CartContext';
+// import { CartContext } from '../contexts/CartContext';
+import CartContext from '../contexts/cartContext';
 
 export default function DishCard({ food }){
   const { add } = useContext(CartContext);
