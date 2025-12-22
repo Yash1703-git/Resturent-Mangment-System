@@ -1,35 +1,42 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AuthContext from './AuthContext';
 import API from '../api/api';
-import AuthContext from './authContext';
 
-const AuthProvider = ({ children }) => {
+export default function AuthProvider({ children }) {
   const [user, setUser] = useState(() =>
-    JSON.parse(localStorage.getItem('auth.user') || 'null')
+    JSON.parse(localStorage.getItem('auth.user'))
   );
-  const [token, setToken] = useState(() =>
-    localStorage.getItem('auth.token') || null
+  const [token, setToken] = useState(
+    localStorage.getItem('auth.token')
   );
 
+  // ✅ declare logout FIRST and stabilize it
   const logout = useCallback(() => {
-    setToken(null);
     setUser(null);
-    localStorage.removeItem('auth.token');
+    setToken(null);
     localStorage.removeItem('auth.user');
+    localStorage.removeItem('auth.token');
   }, []);
 
+  // ✅ effect with correct dependencies
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
+
     if (token && !user) {
       API.get('/auth/me')
         .then(res => {
-          if (!mounted) return;
+          if (!isMounted) return;
           setUser(res.data.user);
           localStorage.setItem('auth.user', JSON.stringify(res.data.user));
         })
-        .catch(logout);
+        .catch(() => {
+          // safe to call now
+          logout();
+        });
     }
+
     return () => {
-      mounted = false;
+      isMounted = false;
     };
   }, [token, user, logout]);
 
@@ -45,6 +52,4 @@ const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export default AuthProvider;
+}
