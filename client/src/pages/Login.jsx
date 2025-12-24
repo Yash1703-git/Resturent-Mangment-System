@@ -1,28 +1,94 @@
 import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthContext from '../contexts/authContext';
 import API from '../api/api';
-import { useNavigate } from 'react-router-dom';
-import { Import } from 'lucide-react';
-// import { AuthContext } from '../contexts/AuthContext';
-import AuthContext from '../contexts/AuthContext';
 
-export default function Login(){
-  const [email,setEmail] = useState(''); const [password,setPassword] = useState('');
+export default function Login() {
   const { login } = useContext(AuthContext);
-  const nav = useNavigate();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const submit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
+
     try {
-      const res = await API.post('/auth/login', { email, password });
+      const res = await API.post('/auth/login', form);
+
+      // save auth
       login(res.data);
-      nav('/');
-    } catch (err) { alert(err.response?.data?.message || 'Login error'); }
+
+      // redirect by role
+      if (res.data.user.role === 'admin') {
+        navigate('/admin/add-food');
+      } else {
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
-    <form onSubmit={submit} className="max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full p-2 border mb-2"/>
-      <input value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" className="w-full p-2 border mb-2"/>
-      <button className="px-4 py-2 bg-indigo-600 text-white rounded">Login</button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <form
+        onSubmit={submit}
+        className="w-full max-w-md bg-white p-6 rounded shadow"
+      >
+        <h2 className="text-xl font-semibold mb-4 text-center">Login</h2>
+
+        {error && (
+          <div className="text-red-600 mb-2 text-sm">
+            {error}
+          </div>
+        )}
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          className="w-full border p-2 mb-3"
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={e => setForm({ ...form, password: e.target.value })}
+          className="w-full border p-2 mb-4"
+          required
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-indigo-600 text-white py-2 rounded"
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+
+        {/* 🔽 SIGNUP LINK */}
+        <p className="text-center text-sm mt-4">
+          Don’t have an account?{' '}
+          <Link
+            to="/signup"
+            className="text-indigo-600 underline"
+          >
+            Sign up
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 }

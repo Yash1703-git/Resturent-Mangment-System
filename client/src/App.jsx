@@ -1,7 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
-// import AuthContext from './contexts/authContext';
-import AuthContext from './contexts/AuthContext';
+import AuthContext from './contexts/authContext';
+import { Import } from 'lucide-react';
+// import AuthContext from './contexts/AuthContext';
 
 // user pages
 import Home from './pages/Home';
@@ -15,13 +16,14 @@ import Signup from './pages/Signup';
 // admin pages (EXISTING FILES)
 import AdminAddFood from './pages/AdminAddFood';
 import AdminOrders from './pages/AdminOrders';
+import AdminManageDishes from './pages/AdminManageDishes';
+
 
 // navbars
 // import UserNavbar from './components/UserNavbar';
 import UserNavbar from './Components/UserNavbar';
-import { Import } from 'lucide-react';
 import AdminNavbar from './Components/AdminNavbar';
-// import AdminNavbar from './components/AdminNavbar';
+
 
 export default function App() {
   const { user } = useContext(AuthContext);
@@ -43,6 +45,7 @@ export default function App() {
       <>
         <AdminNavbar />
         <Routes>
+          <Route path="/admin/manage-dishes" element={<AdminManageDishes />} />
           <Route path="/admin/add-food" element={<AdminAddFood />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="*" element={<Navigate to="/admin/add-food" />} />

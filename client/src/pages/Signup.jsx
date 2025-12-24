@@ -1,28 +1,72 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../api/api';
-import { useNavigate } from 'react-router-dom';
-import  AuthContext  from '../contexts/AuthContext';
-// import AuthContext from '../contexts/authContext';
 
-export default function Signup(){
-  const [name,setName] = useState(''); const [email,setEmail] = useState(''); const [password,setPassword] = useState('');
-  const { login } = useContext(AuthContext);
-  const nav = useNavigate();
+export default function Signup() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+
   const submit = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-      const res = await API.post('/auth/signup', { name, email, password });
-      login(res.data);
-      nav('/');
-    } catch (err) { alert(err.response?.data?.message || 'Signup error'); }
+      await API.post('/auth/signup', form);
+      navigate('/login'); // redirect after signup
+    } catch (err) {
+      setError(err.response?.data?.message || 'Signup failed');
+    }
   };
+
   return (
-    <form onSubmit={submit} className="max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Signup</h2>
-      <input value={name} onChange={e=>setName(e.target.value)} placeholder="Name" className="w-full p-2 border mb-2"/>
-      <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email" className="w-full p-2 border mb-2"/>
-      <input value={password} onChange={e=>setPassword(e.target.value)} placeholder="Password" type="password" className="w-full p-2 border mb-2"/>
-      <button className="px-4 py-2 bg-indigo-600 text-white rounded">Signup</button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center">
+      <form className="border p-6 rounded w-full max-w-sm" onSubmit={submit}>
+        <h2 className="text-xl font-semibold mb-4 text-center">Sign Up</h2>
+
+        {error && <div className="text-red-600 mb-2 text-sm">{error}</div>}
+
+        <input
+          placeholder="Name"
+          value={form.name}
+          onChange={e => setForm({ ...form, name: e.target.value })}
+          className="w-full border p-2 mb-3"
+          required
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={e => setForm({ ...form, email: e.target.value })}
+          className="w-full border p-2 mb-3"
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={e => setForm({ ...form, password: e.target.value })}
+          className="w-full border p-2 mb-4"
+          required
+        />
+
+        <button className="w-full bg-indigo-600 text-white py-2 rounded">
+          Create Account
+        </button>
+
+        <p className="text-center text-sm mt-4">
+          Already have an account?{' '}
+          <Link to="/login" className="text-indigo-600 underline">
+            Login
+          </Link>
+        </p>
+      </form>
+    </div>
   );
 }

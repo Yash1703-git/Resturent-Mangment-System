@@ -13,7 +13,7 @@ export default function SearchBar(){
     navigate(`/menu?${usp.toString()}`);
   };
   return (
-    <form onSubmit={submit} className="w-full">
+    <form onSubmit={submit} className="w-full ">
       <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search dishes..." className="w-full border rounded p-2"/>
     </form>
   );

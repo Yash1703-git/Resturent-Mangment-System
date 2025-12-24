@@ -1,7 +1,9 @@
 // src/pages/Checkout.jsx
 import React, { useContext, useEffect, useState } from 'react';
-import CartContext from '../contexts/CartContext';
-import AuthContext from '../contexts/AuthContext';
+// import CartContext from '../contexts/CartContext';
+// import AuthContext from '../contexts/AuthContext';
+import AuthContext from '../contexts/authContext';
+import CartContext from '../contexts/cartContext';
 import API from '../api/api';
 import { useNavigate } from 'react-router-dom';
 

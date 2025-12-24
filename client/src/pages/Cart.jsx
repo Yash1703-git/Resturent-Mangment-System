@@ -9,7 +9,7 @@ export default function Cart(){
   const { items, increment, decrement, remove, subtotal } = useContext(CartContext);
   const nav = useNavigate();
   return (
-    <div>
+    <div className='p-8'>
       <h2 className="text-xl mb-4">Cart</h2>
       {items.length===0 ? <div>Cart empty. <Link to="/menu" className="text-indigo-600">Browse menu</Link></div> :
         <div className="grid grid-cols-1 gap-4">
