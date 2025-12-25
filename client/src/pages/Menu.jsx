@@ -1,26 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import API from '../api/api';
 import DishCard from '../Components/DishCard';
-import { useLocation } from 'react-router-dom';
+import CartContext from '../contexts/cartContext';
 
 export default function Menu() {
   const [foods, setFoods] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // mobile-only filters
-  const [mobileCategory, setMobileCategory] = useState('all');
-  const [mobilePrice, setMobilePrice] = useState('all');
+  const [selected, setSelected] = useState(null);
+  const [qty, setQty] = useState(1);
+  const [imgIndex, setImgIndex] = useState(0);
 
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const q = params.get('q') || '';
+  // mobile filters
+  const [category, setCategory] = useState('all');
+  const [price, setPrice] = useState('all');
 
-  // fetch once (or on search)
+  const { add } = useContext(CartContext);
+
   useEffect(() => {
     const fetchFoods = async () => {
       setLoading(true);
       try {
-        const res = await API.get('/foods', { params: { q } });
+        const res = await API.get('/foods');
         setFoods(res.data.items || []);
       } catch (err) {
         console.error(err);
@@ -29,58 +30,28 @@ export default function Menu() {
       }
     };
     fetchFoods();
-  }, [q]);
+  }, []);
 
-  /* =======================
-     DESKTOP SECTIONS
-     ======================= */
-
-  const vegFoods = useMemo(
-    () => foods.filter(f => f.category === 'veg'),
-    [foods]
-  );
-
-  const nonVegFoods = useMemo(
-    () => foods.filter(f => f.category === 'nonveg'),
-    [foods]
-  );
-
-  const under99Foods = useMemo(
-    () => foods.filter(f => f.price < 99),
-    [foods]
-  );
-
-  const under299Foods = useMemo(
-    () => foods.filter(f => f.price > 199),
-    [foods]
-  );
-
-  /* =======================
-     MOBILE FILTER RESULT
-     ======================= */
-
-  const mobileFilteredFoods = useMemo(() => {
-    return foods.filter(food => {
-      if (mobileCategory !== 'all' && food.category !== mobileCategory) {
-        return false;
-      }
-      if (mobilePrice === 'under99' && food.price >= 99) return false;
-      if (mobilePrice === 'above99' && food.price < 99) return false;
+  /* ================= FILTER LOGIC ================= */
+  const filteredFoods = useMemo(() => {
+    return foods.filter(f => {
+      if (category !== 'all' && f.category !== category) return false;
+      if (price === 'under99' && f.price >= 99) return false;
+      if (price === 'under299' && f.price >= 299) return false;
       return true;
     });
-  }, [foods, mobileCategory, mobilePrice]);
+  }, [foods, category, price]);
 
   return (
     <div className="p-4 md:p-8">
-
       <h2 className="text-xl font-bold mb-4">Menu</h2>
 
-      {/* ================= MOBILE FILTER BAR ================= */}
-      <div className="md:hidden flex gap-2 mb-4">
+      {/* FILTER BAR (mobile friendly) */}
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <select
-          value={mobileCategory}
-          onChange={e => setMobileCategory(e.target.value)}
-          className="border p-2 rounded w-1/2"
+          value={category}
+          onChange={e => setCategory(e.target.value)}
+          className="border p-2 rounded w-full sm:w-1/3"
         >
           <option value="all">All</option>
           <option value="veg">Veg</option>
@@ -88,81 +59,130 @@ export default function Menu() {
         </select>
 
         <select
-          value={mobilePrice}
-          onChange={e => setMobilePrice(e.target.value)}
-          className="border p-2 rounded w-1/2"
+          value={price}
+          onChange={e => setPrice(e.target.value)}
+          className="border p-2 rounded w-full sm:w-1/3"
         >
           <option value="all">All Prices</option>
           <option value="under99">Under ₹99</option>
-          <option value="above99">Above ₹99</option>
+          <option value="under299">Under ₹299</option>
         </select>
       </div>
 
-      {/* ================= MOBILE RESULT ================= */}
-      <div className="md:hidden">
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
-          <div className="grid grid-cols-2 gap-2">
-            {mobileFilteredFoods.map(food => (
-              <DishCard key={food._id} food={food} />
-            ))}
+      {/* GRID */}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          {filteredFoods.map(food => (
+            <DishCard
+              key={food._id}
+              food={food}
+              onClick={() => {
+                setSelected(food);
+                setQty(1);
+                setImgIndex(0);
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ================= MODAL ================= */}
+      {selected && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={() => setSelected(null)}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            className="bg-white rounded-lg w-full max-w-md p-4"
+          >
+            {/* IMAGE CAROUSEL */}
+            <div className="relative h-56 rounded overflow-hidden mb-3">
+              <img
+                src={
+                  Array.isArray(selected.imageUrl)
+                    ? selected.imageUrl[imgIndex]
+                    : selected.imageUrl
+                }
+                className="w-full h-full object-cover"
+              />
+
+              {Array.isArray(selected.imageUrl) && selected.imageUrl.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setImgIndex(i => (i === 0 ? selected.imageUrl.length - 1 : i - 1))
+                    }
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/70 px-2 rounded"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() =>
+                      setImgIndex(i => (i + 1) % selected.imageUrl.length)
+                    }
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/70 px-2 rounded"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+            </div>
+
+            <h3 className="text-lg font-semibold">{selected.title}</h3>
+            <p className="text-sm text-gray-600 mt-1">{selected.description}</p>
+
+            <div className="flex justify-between items-center mt-3">
+              <span className="font-bold text-lg">₹{selected.price}</span>
+              <span
+                className={`text-xs px-2 py-1 rounded text-white ${
+                  selected.category === 'veg' ? 'bg-green-600' : 'bg-red-600'
+                }`}
+              >
+                {selected.category}
+              </span>
+            </div>
+
+            {/* QUANTITY */}
+            <div className="flex items-center gap-3 mt-4">
+              <button
+                onClick={() => setQty(q => Math.max(1, q - 1))}
+                className="px-3 py-1 border rounded"
+              >
+                −
+              </button>
+              <span>{qty}</span>
+              <button
+                onClick={() => setQty(q => q + 1)}
+                className="px-3 py-1 border rounded"
+              >
+                +
+              </button>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex justify-end gap-2 mt-5">
+              <button
+                onClick={() => setSelected(null)}
+                className="px-4 py-2 border rounded"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  add(selected, qty);
+                  setSelected(null);
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded"
+              >
+                Add to Cart
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* ================= DESKTOP / TABLET SECTIONS ================= */}
-      <div className="hidden md:block space-y-10">
-
-        {/* VEG SECTION */}
-        {vegFoods.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3">🥗 Veg</h3>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-              {vegFoods.map(food => (
-                <DishCard key={food._id} food={food} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* NON-VEG SECTION */}
-        {nonVegFoods.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3">🍗 Non-Veg</h3>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-              {nonVegFoods.map(food => (
-                <DishCard key={food._id} food={food} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* UNDER 99 SECTION */}
-        {under99Foods.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3">🔥 Under ₹99</h3>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-              {under99Foods.map(food => (
-                <DishCard key={food._id} food={food} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/*UNDER 299 SECTION */}
-        {under299Foods.length > 0 && (
-          <section>
-            <h3 className="text-lg font-semibold mb-3">🔥 Under ₹299</h3>
-            <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-              {under299Foods.map(food => (
-                <DishCard key={food._id} food={food} />
-              ))}
-            </div>
-          </section>
-        )}
-
-      </div>
+        </div>
+      )}
     </div>
   );
 }

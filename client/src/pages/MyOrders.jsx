@@ -36,7 +36,7 @@ export default function MyOrders() {
   }, []); // no external deps
 
   return (
-    <div>
+    <div className='py-3 px-8'>
       <h2 className="text-xl mb-4">My Orders</h2>
 
       {loading && <div>Loading orders...</div>}

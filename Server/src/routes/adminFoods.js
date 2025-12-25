@@ -1,49 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const Food = require('../models/Food'); // ⭐ FIX
-const { createFood, deleteFood } = require('../controllers/foodController');
+const Food = require('../models/Food');
 const { auth, adminOnly } = require('../middleware/auth');
 
 router.use(auth, adminOnly);
 
-// CREATE
-router.post('/', createFood);
+// CREATE DISH
+router.post('/', async (req, res) => {
+  try {
+    const food = await Food.create({
+      title: req.body.title,
+      description: req.body.description,
+      price: req.body.price,
+      imageUrl: req.body.imageUrl,
+      category: req.body.category,
+      type: req.body.type, // ⭐ NEW
+      isFeatured: req.body.isFeatured,
+    });
 
-// DELETE
-router.delete('/:id', deleteFood);
+    res.status(201).json(food);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to create dish' });
+  }
+});
 
-// UPDATE (FEATURED FIX)
+// UPDATE DISH
 router.put('/:id', async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      price,
-      imageUrl,
-      category,
-      isFeatured,
-    } = req.body;
-
     const updated = await Food.findByIdAndUpdate(
       req.params.id,
       {
-        title,
-        description,
-        price,
-        imageUrl,
-        category,
-        isFeatured,
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        imageUrl: req.body.imageUrl,
+        category: req.body.category,
+        type: req.body.type, // ⭐ NEW
+        isFeatured: req.body.isFeatured,
       },
       { new: true, runValidators: true }
     );
 
-    if (!updated) {
-      return res.status(404).json({ message: 'Dish not found' });
-    }
-
     res.json(updated);
   } catch (err) {
-    console.error('UPDATE FOOD ERROR:', err);
+    console.error(err);
     res.status(500).json({ message: 'Failed to update dish' });
   }
 });

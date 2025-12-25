@@ -5,16 +5,28 @@ const FoodSchema = new mongoose.Schema({
   description: { type: String },
   price: { type: Number, required: true },
   imageUrl: { type: String },
-  category: { type: String },
 
-  // ⭐ REQUIRED
-  isFeatured: {
-    type: Boolean,
-    default: false
+  // category = veg / nonveg
+  category: { type: String, required: true },
+
+  // ⭐ NEW FIELD
+  type: {
+    type: String,
+    enum: ['lunch', 'starter', 'drinks', 'snacks'],
+    required: false,
   },
 
-  isAvailable: { type: Boolean, default: true },
-  createdAt: { type: Date, default: Date.now }
+  isFeatured: {
+    type: Boolean,
+    default: false,
+  },
+
+  isAvailable: {
+    type: Boolean,
+    default: true,
+  },
+
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Food', FoodSchema);

@@ -1,44 +1,38 @@
-import { useContext } from 'react';
-import CartContext from '../contexts/cartContext';
+import React from 'react';
 
-export default function DishCard({ food }) {
-  const { add } = useContext(CartContext);
-
+export default function DishCard({ food, onClick }) {
   return (
-    <div className="border rounded-lg shadow-sm p-3 flex flex-col w-full max-w-xs gap-2">
-
-     {/* FEATURED BADGE */}
-      {food.isFeatured && (
-        <span className="absolute top-2 left-2 bg-yellow-400 text-xs font-semibold px-2 py-0.5 rounded">
-          ⭐ Featured
-        </span>
-      )}
-
-      {/* IMAGE – SQUARE */}
-      <div className="w-full aspect-square overflow-hidden rounded ">
+    <div
+      onClick={onClick}
+      className="border rounded-lg p-2 cursor-pointer hover:shadow transition flex flex-col"
+    >
+      <div className="relative aspect-square rounded overflow-hidden">
         <img
           src={food.imageUrl}
           alt={food.title}
           className="w-full h-full object-cover"
         />
+
+        {/* Veg / Non-Veg badge */}
+        <span
+          className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded text-white ${
+            food.category === 'veg' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+        >
+          {food.category}
+        </span>
       </div>
 
-      {/* CONTENT */}
-      <h3 className="font-semibold text-sm mt-2 truncate">
-        {food.title}
-      </h3>
+      <h3 className="text-sm font-semibold mt-2 truncate">{food.title}</h3>
 
-      <p className="text-sm font-medium text-gray-600">
-        ₹{food.price}
-      </p>
+      <div className="flex justify-between items-center mt-1">
+        <span className="text-sm font-medium">₹{food.price}</span>
 
-      {/* BUTTON */}
-      <button
-        onClick={() => add(food)}
-        className="mt-auto bg-indigo-600 text-white text-sm py-1.5 rounded hover:bg-indigo-700"
-      >
-        Add to Cart
-      </button>
+        {/* Rating stars (UI only) */}
+        <div className="text-yellow-500 text-xs">
+          ★★★★☆
+        </div>
+      </div>
     </div>
   );
 }

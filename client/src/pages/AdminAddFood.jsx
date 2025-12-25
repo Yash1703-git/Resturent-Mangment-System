@@ -6,12 +6,14 @@ export default function AdminAddFood() {
   const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
-    title: '',
-    description: '',
-    price: '',
-    imageUrl: '',
-    category: '',
-  });
+  title: '',
+  description: '',
+  price: '',
+  imageUrl: '',
+  category: 'veg',
+  type: '', 
+  isFeatured: false,
+});
 
   // ✅ fetch foods INSIDE useEffect (lint-safe)
   useEffect(() => {
@@ -52,6 +54,7 @@ export default function AdminAddFood() {
         price: '',
         imageUrl: '',
         category: '',
+        type: '',
       });
 
       // reload foods after add
@@ -115,6 +118,14 @@ export default function AdminAddFood() {
           onChange={e => setForm({ ...form, category: e.target.value })}
           className="border p-2"
         />
+        <select value={form.type}
+          onChange={(e) => setForm({ ...form, type: e.target.value })}
+          className="border p-2 rounded">
+          <option value="lunch">Lunch</option>
+          <option value="starter">Starter</option>
+          <option value="drinks">Drinks</option>
+          <option value="snacks">Snacks</option>
+        </select>
 
         <button className="bg-indigo-600 text-white py-2 rounded">
           Add Dish
