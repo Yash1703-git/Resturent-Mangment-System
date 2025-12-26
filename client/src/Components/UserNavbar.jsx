@@ -10,8 +10,8 @@ import {
   Search
 } from 'lucide-react';
 
-import AuthContext from '../contexts/authContext';
-import CartContext from '../contexts/cartContext';
+import AuthContext from '../contexts/AuthContext';
+import CartContext from '../contexts/CartContext';
 import SearchBar from './SearchBar';
 
 export default function UserNavbar() {
