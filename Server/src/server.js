@@ -16,9 +16,24 @@ const app = express();
 
 /* ---------- MIDDLEWARE ---------- */
 app.use(express.json());
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://resturent-mangment-system.vercel.app',
+];
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: (origin, callback) => {
+      // allow server-to-server / Postman
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('CORS not allowed'));
+    },
     credentials: true,
   })
 );
