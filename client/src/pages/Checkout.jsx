@@ -51,48 +51,51 @@ export default function Checkout() {
   };
 
   // Optionally save address on user profile (best-effort; server endpoint optional)
-  const saveAddressServer = async () => {
-    if (!token) return; // only attempt when logged in
-    try {
-      // If your server implements PUT /auth/me to update profile, this will work.
-      await API.put('/auth/me', { address });
-    } catch {
-      // Ignore server failure; address remains in localStorage
-    }
-  };
+  // const saveAddressServer = async () => {
+  //   if (!token) return; // only attempt when logged in
+  //   try {
+  //     // If your server implements PUT /auth/me to update profile, this will work.
+  //     await API.put('/auth/me', { address });
+  //   } catch {
+  //     // Ignore server failure; address remains in localStorage
+  //   }
+  // };
 
   const validateAddress = (addr) => {
     if (!addr) return false;
     return Boolean(addr.line1 && addr.city && addr.state && addr.zip && addr.phone);
   };
 
-  const placeOrder = async () => {
-    setError('');
-    if (!items || items.length === 0) {
-      setError('Cart is empty.');
-      return;
-    }
-    if (!validateAddress(address)) {
-      setError('Please complete the address (line1, city, state, zip, phone).');
-      return;
-    }
+ const placeOrder = async () => {
+  setError('');
 
+  if (!token) {
+    nav('/login');
+    return;
+  }
+
+  if (!items.length) {
+    setError('Cart is empty');
+    return;
+  }
+
+  if (!validateAddress(address)) {
+    setError('Please complete the address');
+    return;
+  }
+
+  try {
     setPlacing(true);
-    try {
-      // Send only the necessary shape (server will re-validate/prices)
-      await API.post('/orders', { items, address });
-      // attempt to persist address to server profile (optional)
-      await saveAddressServer();
-      clear();
-      // keep the saved local address for future checkouts
-      localStorage.setItem('address', JSON.stringify(address));
-      nav('/my-orders');
-    } catch (err) {
-      const msg = err?.response?.data?.message || err?.message || 'Order failed';
-      setError(msg);
-      setPlacing(false);
-    }
-  };
+    await API.post('/orders', { items, address });
+    clear();
+    localStorage.setItem('address', JSON.stringify(address));
+    nav('/my-orders');
+  } catch (err) {
+    setError(err?.response?.data?.message || 'Order failed');
+  } finally {
+    setPlacing(false);
+  }
+};
 
   return (
     <div className="max-w-xl mx-auto">

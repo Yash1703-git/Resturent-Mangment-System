@@ -25,14 +25,15 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, callback) => {
-      // allow server-to-server / Postman
+      // allow Postman / server-to-server
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error('CORS not allowed'));
+      // ❗ DO NOT throw error — just deny silently
+      return callback(null, false);
     },
     credentials: true,
   })
@@ -57,7 +58,7 @@ connectDB(process.env.MONGODB_URI)
       console.log(`🚀 Server running on port ${PORT}`);
     });
   })
-  .catch((err) => {
-    console.error('❌ Failed to connect to MongoDB', err.message);
+  .catch(err => {
+    console.error('❌ MongoDB error:', err.message);
     process.exit(1);
   });
