@@ -29,9 +29,6 @@ export default function DishCard({ food, onClick }) {
         <span className="text-sm font-medium">₹{food.price}</span>
 
         {/* Rating stars (UI only) */}
-        <div className="text-yellow-500 text-xs">
-          ★★★★☆
-        </div>
       </div>
     </div>
   );
