@@ -39,11 +39,11 @@ app.use(
 );
 
 /* ---------- ROUTES ---------- */
-app.use('/api/auth', authRoutes);
-app.use('/api/foods', foodRoutes);
-app.use('/api/admin/foods', adminFoodRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/admin/orders', adminOrderRoutes);
+app.use('/auth', authRoutes);
+app.use('/foods', foodRoutes);
+app.use('/admin/foods', adminFoodRoutes);
+app.use('/orders', orderRoutes);
+app.use('/admin/orders', adminOrderRoutes);
 
 /* ---------- ERROR HANDLER ---------- */
 app.use(errorHandler);
