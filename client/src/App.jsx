@@ -1,8 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
-import AuthContext from './contexts/authContext';
 import { Import } from 'lucide-react';
-// import AuthContext from './contexts/AuthContext';
+import AuthContext from './contexts/AuthContext';
 
 // user pages
 import Home from './pages/Home';
