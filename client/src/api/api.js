@@ -1,12 +1,16 @@
 import axios from 'axios';
+
 const API = axios.create({
   baseURL: 'https://resturent-mangment-system.onrender.com/api',
   withCredentials: true,
 });
-API.interceptors.request.use(config => {
+
+API.interceptors.request.use((config) => {
   const token = localStorage.getItem('auth.token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
-export default API;
 
+export default API;
