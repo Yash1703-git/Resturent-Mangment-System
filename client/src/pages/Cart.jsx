@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 // import CartContext  from '../contexts/CartContext';
-import CartContext from '../contexts/cartContext';
+import CartContext from '../contexts/CartContext';
 // import QuantityStepper from '../components/QuantityStepper';
 import QuantityStepper from '../Components/QuantityStepper';
 import { Link, useNavigate } from 'react-router-dom';

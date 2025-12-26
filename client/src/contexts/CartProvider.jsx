@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import CartContext from './cartContext';
+import CartContext from './CartContext';
 
 export default function CartProvider({ children }) {
   const [items, setItems] = useState(() => {
