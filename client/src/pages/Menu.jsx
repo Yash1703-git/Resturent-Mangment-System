@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useContext } from 'react';
 import API from '../api/api';
 import DishCard from '../Components/DishCard';
-import CartContext from '../contexts/cartContext';
+import CartContext from '../contexts/CartContext';
 
 export default function Menu() {
   const [foods, setFoods] = useState([]);
