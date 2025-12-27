@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useContext } from 'react';
-import { Import } from 'lucide-react';
 import AuthContext from './contexts/AuthContext';
 
 // user pages
@@ -12,57 +11,89 @@ import MyOrders from './pages/MyOrders';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 
-// admin pages (EXISTING FILES)
+// admin pages
 import AdminAddFood from './pages/AdminAddFood';
 import AdminOrders from './pages/AdminOrders';
 import AdminManageDishes from './pages/AdminManageDishes';
 
-
 // navbars
-// import UserNavbar from './components/UserNavbar';
 import UserNavbar from './Components/UserNavbar';
 import AdminNavbar from './Components/AdminNavbar';
 
-
-function App() {
-  const { user} = useContext(AuthContext);
+export default function App() {
+  const { user } = useContext(AuthContext);
 
   return (
-    <Routes>
-      {/* PUBLIC */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/menu" element={<Menu />} />
+    <>
+      {/* NAVBAR */}
+      {user?.role === 'admin' && <AdminNavbar />}
+      {user && user.role !== 'admin' && <UserNavbar />}
 
-      {/* ADMIN ROUTES (ALWAYS DECLARED) */}
-      <Route
-        path="/admin/add-dish"
-        element={
-          user?.role === 'admin'
-            ? <AdminAddFood />
-            : <Navigate to="/login" />
-        }
-      />
-      <Route
-        path="/admin/manage-dishes"
-        element={
-          user?.role === 'admin'
-            ? <AdminManageDishes />
-            : <Navigate to="/login" />
-        }
-      />
-      <Route
-        path="/admin/orders"
-        element={
-          user?.role === 'admin'
-            ? <AdminOrders />
-            : <Navigate to="/login" />
-        }
-      />
+      <Routes>
+        {/* ---------- AUTH ---------- */}
+        <Route
+          path="/login"
+          element={!user ? <Login /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/signup"
+          element={!user ? <Signup /> : <Navigate to="/" />}
+        />
 
-      {/* FALLBACK */}
-      <Route path="*" element={<Navigate to="/menu" />} />
-    </Routes>
+        {/* ---------- USER ROUTES ---------- */}
+        <Route
+          path="/"
+          element={user ? <Home /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/menu"
+          element={user ? <Menu /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/cart"
+          element={user ? <Cart /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/checkout"
+          element={user ? <Checkout /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/my-orders"
+          element={user ? <MyOrders /> : <Navigate to="/login" />}
+        />
+
+        {/* ---------- ADMIN ROUTES ---------- */}
+        <Route
+          path="/admin/add-food"
+          element={
+            user?.role === 'admin'
+              ? <AdminAddFood />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/admin/manage-dishes"
+          element={
+            user?.role === 'admin'
+              ? <AdminManageDishes />
+              : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/admin/orders"
+          element={
+            user?.role === 'admin'
+              ? <AdminOrders />
+              : <Navigate to="/login" />
+          }
+        />
+
+        {/* ---------- FALLBACK ---------- */}
+        <Route
+          path="*"
+          element={<Navigate to={user ? '/' : '/login'} />}
+        />
+      </Routes>
+    </>
   );
 }
-
-export default App;
