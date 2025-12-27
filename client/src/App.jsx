@@ -24,47 +24,45 @@ import UserNavbar from './Components/UserNavbar';
 import AdminNavbar from './Components/AdminNavbar';
 
 
-export default function App() {
-  const { user } = useContext(AuthContext);
+function App() {
+  const { user} = useContext(AuthContext);
 
-  // NOT LOGGED IN → only auth pages
-  if (!user) {
-    return (
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
-    );
-  }
-
-  // ADMIN
-  if (user.role === 'admin') {
-    return (
-      <>
-        <AdminNavbar />
-        <Routes>
-          <Route path="/admin/manage-dishes" element={<AdminManageDishes />} />
-          <Route path="/admin/add-food" element={<AdminAddFood />} />
-          <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="*" element={<Navigate to="/admin/add-food" />} />
-        </Routes>
-      </>
-    );
-  }
-
-  // USER
   return (
-    <>
-      <UserNavbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/my-orders" element={<MyOrders />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </>
+    <Routes>
+      {/* PUBLIC */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/menu" element={<Menu />} />
+
+      {/* ADMIN ROUTES (ALWAYS DECLARED) */}
+      <Route
+        path="/admin/add-dish"
+        element={
+          user?.role === 'admin'
+            ? <AdminAddFood />
+            : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/admin/manage-dishes"
+        element={
+          user?.role === 'admin'
+            ? <AdminManageDishes />
+            : <Navigate to="/login" />
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          user?.role === 'admin'
+            ? <AdminOrders />
+            : <Navigate to="/login" />
+        }
+      />
+
+      {/* FALLBACK */}
+      <Route path="*" element={<Navigate to="/menu" />} />
+    </Routes>
   );
 }
+
+export default App;
