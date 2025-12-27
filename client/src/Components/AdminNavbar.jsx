@@ -9,10 +9,11 @@ export default function AdminNavbar() {
   return (
     <nav className="bg-gray-100 border-b">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center ">
-        <span className="font-bold">Admin Panel</span>
+        {/* <span className="font-bold">Admin Panel</span> */}
+        <Link to="/admin/add-food" className="font-bold">Admin Panel</Link>
 
         <div className="hidden md:flex gap-6">
-          <Link to="/admin/add-food">Add Dish</Link>
+          <Link to="/admin/add-food" >Add Dish</Link>
           <Link to="/admin/manage-dishes">Manage Dishes</Link>
           <Link to="/admin/orders">Orders</Link>
           <button onClick={logout} className="text-red-600">
