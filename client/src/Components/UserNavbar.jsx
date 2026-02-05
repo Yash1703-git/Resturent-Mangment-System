@@ -2,7 +2,7 @@ import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
 
-import CartContext from '../contexts/cartContext';
+import CartContext from '../contexts/CartContext';
 import SearchBar from './SearchBar';
 
 export default function UserNavbar() {

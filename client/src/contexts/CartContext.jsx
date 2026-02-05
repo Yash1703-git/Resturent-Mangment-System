@@ -1,48 +1,28 @@
-import { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import AuthContext from './AuthContext';
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 
 const CartContext = createContext(null);
+export default CartContext;
 
 export function CartProvider({ children }) {
-  const { user } = useContext(AuthContext);
-
-  // 🔑 cart key depends on user
-  const cartKey = useMemo(
-    () => (user ? `cart_${user._id}` : null),
-    [user]
-  );
-
-  // ✅ INITIALIZE STATE (NO useEffect)
+  // ✅ INITIALIZE FROM STORAGE (NO EFFECT)
   const [items, setItems] = useState(() => {
-    if (!cartKey) return [];
     try {
-      return JSON.parse(localStorage.getItem(cartKey)) || [];
+      const stored = sessionStorage.getItem('cart.items');
+      return stored ? JSON.parse(stored) : [];
     } catch {
       return [];
     }
   });
 
-  // ✅ RESET CART WHEN USER CHANGES (NO setState-in-effect warning)
+  // ✅ SIDE EFFECT ONLY (SYNC TO STORAGE)
   useEffect(() => {
-    if (!cartKey) return;
-    try {
-      const saved = localStorage.getItem(cartKey);
-      setItems(saved ? JSON.parse(saved) : []);
-    } catch {
-      setItems([]);
-    }
-  }, [cartKey]);
+    sessionStorage.setItem('cart.items', JSON.stringify(items));
+  }, [items]);
 
-  // ✅ SAVE CART (ALLOWED + SAFE)
-  useEffect(() => {
-    if (!cartKey) return;
-    localStorage.setItem(cartKey, JSON.stringify(items));
-  }, [items, cartKey]);
+  /* ---------- ACTIONS ---------- */
 
-  /* ---------------- CART ACTIONS ---------------- */
-
-  const add = (food, qty = 1) => {
-    if (!user) return;
+  const add = useCallback((food, qty = 1) => {
+    if (!food?._id) return;
 
     setItems(prev => {
       const found = prev.find(i => i.foodId === food._id);
@@ -58,21 +38,22 @@ export function CartProvider({ children }) {
         {
           foodId: food._id,
           title: food.title,
-          price: food.price,
+          price: Number(food.price) || 0,
           qty,
         },
       ];
     });
-  };
+  }, []);
 
-  const increment = id =>
+  const increment = useCallback(id => {
     setItems(prev =>
       prev.map(i =>
         i.foodId === id ? { ...i, qty: i.qty + 1 } : i
       )
     );
+  }, []);
 
-  const decrement = id =>
+  const decrement = useCallback(id => {
     setItems(prev =>
       prev
         .map(i =>
@@ -80,14 +61,28 @@ export function CartProvider({ children }) {
         )
         .filter(i => i.qty > 0)
     );
+  }, []);
 
-  const remove = id =>
+  const remove = useCallback(id => {
     setItems(prev => prev.filter(i => i.foodId !== id));
+  }, []);
 
-  const clear = () => setItems([]);
+  const clear = useCallback(() => {
+    setItems([]);
+    sessionStorage.removeItem('cart.items');
+  }, []);
 
-  const totalQty = items.reduce((s, i) => s + i.qty, 0);
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  /* ---------- DERIVED VALUES ---------- */
+
+  const totalQty = useMemo(
+    () => items.reduce((sum, i) => sum + i.qty, 0),
+    [items]
+  );
+
+  const subtotal = useMemo(
+    () => items.reduce((sum, i) => sum + i.price * i.qty, 0),
+    [items]
+  );
 
   return (
     <CartContext.Provider
@@ -106,5 +101,3 @@ export function CartProvider({ children }) {
     </CartContext.Provider>
   );
 }
-
-export default CartContext;
