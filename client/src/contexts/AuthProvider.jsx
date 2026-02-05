@@ -10,12 +10,15 @@ export default function AuthProvider({ children }) {
     sessionStorage.getItem('auth.token')
   );
 
+  /* ================= LOGOUT ================= */
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
     sessionStorage.clear();
+    localStorage.clear(); // 🔥 clears cart
   }, []);
 
+  /* ================= AUTO LOGIN ================= */
   useEffect(() => {
     if (token && !user) {
       API.get('/auth/me')
@@ -26,19 +29,25 @@ export default function AuthProvider({ children }) {
             JSON.stringify(res.data.user)
           );
         })
-        .catch(() => logout());
+        .catch(logout);
     }
   }, [token, user, logout]);
 
+  /* ================= LOGIN ================= */
   const login = ({ token, user }) => {
     setToken(token);
     setUser(user);
     sessionStorage.setItem('auth.token', token);
-    sessionStorage.setItem('auth.user', JSON.stringify(user));
+    sessionStorage.setItem(
+      'auth.user',
+      JSON.stringify(user)
+    );
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,8 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useContext } from 'react';
 import AuthContext from './contexts/AuthContext';
 
-// user pages
+// pages
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Cart from './pages/Cart';
@@ -22,33 +22,30 @@ import AdminNavbar from './Components/AdminNavbar';
 
 export default function App() {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
+
+  // 🔑 hide navbar on auth pages
+  const hideNavbar =
+    location.pathname === '/login' ||
+    location.pathname === '/signup';
 
   return (
     <>
       {/* NAVBAR */}
-      {user?.role === 'admin' && <AdminNavbar />}
-      {user && user.role !== 'admin' && <UserNavbar />}
+      {!hideNavbar && (
+        user?.role === 'admin' ? <AdminNavbar /> : <UserNavbar />
+      )}
 
       <Routes>
-        {/* ---------- AUTH ---------- */}
-        <Route
-          path="/login"
-          element={!user ? <Login /> : <Navigate to="/" />}
-        />
-        <Route
-          path="/signup"
-          element={!user ? <Signup /> : <Navigate to="/" />}
-        />
+        {/* PUBLIC */}
+        <Route path="/" element={<Home />} />
+        <Route path="/menu" element={<Menu />} />
 
-        {/* ---------- USER ROUTES ---------- */}
-        <Route
-          path="/"
-          element={user ? <Home /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/menu"
-          element={user ? <Menu /> : <Navigate to="/login" />}
-        />
+        {/* AUTH */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* USER PROTECTED */}
         <Route
           path="/cart"
           element={user ? <Cart /> : <Navigate to="/login" />}
@@ -62,37 +59,22 @@ export default function App() {
           element={user ? <MyOrders /> : <Navigate to="/login" />}
         />
 
-        {/* ---------- ADMIN ROUTES ---------- */}
+        {/* ADMIN PROTECTED */}
         <Route
           path="/admin/add-food"
-          element={
-            user?.role === 'admin'
-              ? <AdminAddFood />
-              : <Navigate to="/login" />
-          }
+          element={user?.role === 'admin' ? <AdminAddFood /> : <Navigate to="/" />}
         />
         <Route
           path="/admin/manage-dishes"
-          element={
-            user?.role === 'admin'
-              ? <AdminManageDishes />
-              : <Navigate to="/login" />
-          }
+          element={user?.role === 'admin' ? <AdminManageDishes /> : <Navigate to="/" />}
         />
         <Route
           path="/admin/orders"
-          element={
-            user?.role === 'admin'
-              ? <AdminOrders />
-              : <Navigate to="/login" />
-          }
+          element={user?.role === 'admin' ? <AdminOrders /> : <Navigate to="/" />}
         />
 
-        {/* ---------- FALLBACK ---------- */}
-        <Route
-          path="*"
-          element={<Navigate to={user ? '/' : '/login'} />}
-        />
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
   );
