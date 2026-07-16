@@ -1,6 +1,7 @@
 // src/pages/MyOrders.jsx
 import React, { useEffect, useState } from 'react';
 import API from '../api/api';
+import SplashLoader from '../Components/SplashLoader';
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -34,6 +35,9 @@ export default function MyOrders() {
       clearInterval(id);
     };
   }, []); // no external deps
+  if (loading) {
+  return <SplashLoader />;
+}
 
   return (
     <div className='py-3 px-8'>

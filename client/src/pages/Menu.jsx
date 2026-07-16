@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useContext } from 'react';
 import API from '../api/api';
 import DishCard from '../Components/DishCard';
 import CartContext from '../contexts/CartContext';
+import SplashLoader from '../Components/SplashLoader';
 
 export default function Menu() {
   const [foods, setFoods] = useState([]);
@@ -48,6 +49,9 @@ export default function Menu() {
       return true;
     });
   }, [foods, category, price]);
+  if (loading) {
+  return <SplashLoader />;
+}
 
   return (
     <div className="p-4 md:p-8">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import API from '../api/api';
+import SplashLoader from '../Components/SplashLoader';
 
 export default function AdminManageDishes() {
   const [foods, setFoods] = useState([]);
@@ -64,7 +65,9 @@ export default function AdminManageDishes() {
     setFoods(prev => prev.filter(f => f._id !== id));
   };
 
-  if (loading) return <div className="p-4">Loading dishes...</div>;
+  if (loading) {
+  return <SplashLoader />;
+}
 
   /* ================= UI ================= */
   return (

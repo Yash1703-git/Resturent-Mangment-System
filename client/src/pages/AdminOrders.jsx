@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import API from '../api/api';
+import SplashLoader from '../Components/SplashLoader';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
